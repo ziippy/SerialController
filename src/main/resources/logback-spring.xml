@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="_LOG_FILE_DIR" value="./ac_logs" />
+	<property name="_LOG_FILE_NAME" value="${log.file.name:-acs_controller_log_}" /> <!-- excluding path and extension -->
+	<property name="_LOG_TIMEZONE" value="${log.timezone:-Asia/Seoul}" />
+	<property name="_LOG_LEVEL_ROOT"
+		value="${log.root.level:-${log.level.default:-INFO}}" />
+	<property name="_LOG_LEVEL_SPRING"
+		value="${log.spring.level:-${log.level.default:-INFO}}" />
+
+	<property name="_PATTERN_HEADER"
+		value="[%d{yy/MM/dd HH:mm:ss:SSS, ${_LOG_TIMEZONE}}|%-5p|%X{pid}|%t|%c{2}]" />
+
+	<appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>TRACE</level>
+		</filter>
+		<encoder>
+			<pattern>${_PATTERN_HEADER} %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="DRFA"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- Do NOT specify file element to use prudent mode -->
+		<prudent>true</prudent>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${_LOG_FILE_DIR}/${_LOG_FILE_NAME}.%d{yyyy-MM-dd,
+				${_LOG_TIMEZONE}}.%i.log</fileNamePattern>
+			<maxHistory>10</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>TRACE</level>
+		</filter>
+		<encoder>
+			<pattern>${_PATTERN_HEADER} %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="${_LOG_LEVEL_ROOT}">
+		<appender-ref ref="Console" />
+		<appender-ref ref="DRFA" />
+	</root>
+
+	<logger name="org.springframework" level="${_LOG_LEVEL_SPRING}"
+		additivity="false">
+		<appender-ref ref="Console" />
+		<appender-ref ref="DRFA" />
+	</logger>
+
+</configuration>
